@@ -1,4 +1,4 @@
-const API = import.meta.env.VITE_API_URL;
+const API = "https://job-queue-dashboard-kcjz.onrender.com";
 
 export interface Job {
   id: number;
