@@ -1,4 +1,4 @@
-const API = "https://job-queue-dashboard-kcjz.onrender.com";
+const API = "https://job-queue-dashboard-kjcj.onrender.com/jobs";
 
 export interface Job {
   id: number;
