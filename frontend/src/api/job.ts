@@ -1,0 +1,45 @@
+const API = import.meta.env.VITE_API_URL;
+
+export interface Job {
+  id: number;
+  title: string;
+  type: string;
+  status: 'PENDING' | 'RUNNING' | 'COMPLETED' | 'FAILED';
+  createdAt: string;
+}
+
+export async function createJob(title: string, type: string): Promise<Job> {
+  const res = await fetch(`${API}/jobs`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ title, type }),
+  });
+  if (!res.ok) throw new Error('Failed to create job');
+  return res.json();
+}
+
+export async function getJobs(): Promise<Job[]> {
+  const res = await fetch(`${API}/jobs`);
+  if (!res.ok) throw new Error('Failed to load jobs');
+  return res.json();
+}
+
+export async function updateJobStatus(
+  id: number,
+  status: string,
+): Promise<Job> {
+  const res = await fetch(`${API}/jobs/${id}/status`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ status }),
+  });
+  if (!res.ok) throw new Error('Failed to update job');
+  return res.json();
+}
+
+export async function deleteJob(id: number): Promise<void> {
+  const res = await fetch(`${API}/jobs/${id}`, {
+    method: 'DELETE',
+  });
+  if (!res.ok) throw new Error('Failed to delete job');
+}
