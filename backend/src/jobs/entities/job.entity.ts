@@ -4,4 +4,6 @@ export class Job {
   type: string;
   status: string;
   createdAt: Date;
+  startedAt: Date | null;
+  completedAt: Date | null;
 }

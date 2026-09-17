@@ -19,4 +19,6 @@ model Job {
   type      String
   status    JobStatus @default(PENDING)
   createdAt DateTime  @default(now())
+  startedAt DateTime?
+  completedAt DateTime?
 }

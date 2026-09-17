@@ -50,16 +50,23 @@ export class JobsService {
       );
     }
 
-    // CONCURRENCY FIX: Use updateMany with conditional status
-    // Only update if the current status in DB matches what we expect
-    // This prevents two simultaneous requests both succeeding
+    const now = new Date();
+    const timestampData =
+      nextStatus === JobStatus.RUNNING
+        ? { startedAt: now }
+        : nextStatus === JobStatus.COMPLETED || nextStatus === JobStatus.FAILED
+          ? { completedAt: now }
+          : {};
+
+    // prevents two simultaneous requests both succeeding
     const result = await this.prisma.job.updateMany({
-      where: {
+      where: { //..here wehere clause ensure only one succeeds
         id,
         status: currentStatus, // Only update if status hasn't changed
       },
       data: {
         status: nextStatus,
+        ...timestampData,
       },
     });
 

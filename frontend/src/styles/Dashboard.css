@@ -181,6 +181,11 @@ table td {
   border-bottom: 1px solid #eee;
 }
 
+.duration {
+  font-family: 'Courier New', Courier, monospace;
+  white-space: nowrap;
+}
+
 table tbody tr:hover {
   background: #f9f9f9;
 }

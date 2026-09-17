@@ -6,6 +6,8 @@ export interface Job {
   type: string;
   status: 'PENDING' | 'RUNNING' | 'COMPLETED' | 'FAILED';
   createdAt: string;
+  startedAt: string | null;
+  completedAt: string | null;
 }
 
 export async function createJob(title: string, type: string): Promise<Job> {
@@ -33,7 +35,25 @@ export async function updateJobStatus(
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ status }),
   });
-  if (!res.ok) throw new Error('Failed to update job');
+  if (res.status === 400) {
+    const errorBody: unknown = await res.json().catch(() => null);
+    const message =
+      typeof errorBody === 'string'
+        ? errorBody
+        : errorBody && typeof errorBody === 'object'
+          ? 'message' in errorBody && typeof errorBody.message === 'string'
+            ? errorBody.message
+            : 'error' in errorBody && typeof errorBody.error === 'string'
+              ? errorBody.error
+              : null
+          : null;
+
+    throw new Error(message || 'Invalid job status update');
+  }
+
+  if (!res.ok) {
+    throw new Error('Unable to update job status');
+  }
   return res.json();
 }
 

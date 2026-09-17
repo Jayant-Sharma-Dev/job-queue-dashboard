@@ -43,6 +43,12 @@ let JobsService = class JobsService {
         if (!allowedTransitions[currentStatus]?.includes(nextStatus)) {
             throw new BadRequestException(`Cannot transition from ${currentStatus} to ${nextStatus}`);
         }
+        const now = new Date();
+        const timestampData = nextStatus === JobStatus.RUNNING
+            ? { startedAt: now }
+            : nextStatus === JobStatus.COMPLETED || nextStatus === JobStatus.FAILED
+                ? { completedAt: now }
+                : {};
         const result = await this.prisma.job.updateMany({
             where: {
                 id,
@@ -50,6 +56,7 @@ let JobsService = class JobsService {
             },
             data: {
                 status: nextStatus,
+                ...timestampData,
             },
         });
         if (result.count === 0) {

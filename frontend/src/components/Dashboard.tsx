@@ -3,6 +3,25 @@ import { getJobs, createJob, updateJobStatus, deleteJob } from '../api/job';
 import type { Job } from '../api/job';
 import '../styles/Dashboard.css';
 
+// Bonus featur : show how long each job took to complete.
+function getDuration(startedAt: string | null, completedAt: string | null): string {
+  if (!startedAt || !completedAt) {
+    return '-';
+  }
+
+  const durationSeconds = Math.max(
+    0,
+    Math.floor((new Date(completedAt).getTime() - new Date(startedAt).getTime()) / 1000),
+  );
+  const hours = Math.floor(durationSeconds / 3600);
+  const minutes = Math.floor((durationSeconds % 3600) / 60);
+  const seconds = durationSeconds % 60;
+
+  return hours > 0
+    ? `${hours}h ${minutes}m ${seconds}s`
+    : `${minutes}m ${seconds}s`;
+}
+
 export function Dashboard() {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
@@ -52,12 +71,38 @@ export function Dashboard() {
   }
 
   async function handleStatusChange(jobId: number, newStatus: string) {
+    const job = jobs.find((currentJob) => currentJob.id === jobId);
+
     try {
       setError(null);
       await updateJobStatus(jobId, newStatus);
       await loadJobs();
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Failed to update job');
+      const errorMessage = err instanceof Error ? err.message : '';
+      const isNoLongerPending =
+        job?.status === 'PENDING' &&
+        newStatus === 'RUNNING' &&
+        (errorMessage.includes('Cannot transition') ||
+          errorMessage === 'Job status has already changed' ||
+          errorMessage === 'Invalid job status update');
+      const isAlreadyUpdated =
+        !isNoLongerPending &&
+        (/Cannot transition from (COMPLETED|FAILED) to/i.test(errorMessage) ||
+          errorMessage === 'Job status has already changed' ||
+          ((job?.status === 'COMPLETED' || job?.status === 'FAILED') &&
+            errorMessage === 'Invalid job status update'));
+
+      setError(
+        isNoLongerPending
+          ? 'Job is no longer pending'
+          : isAlreadyUpdated
+            ? 'Job is already updated'
+          : errorMessage
+            ? errorMessage
+            : job
+              ? `Cannot transition from ${job.status} to ${newStatus}`
+              : 'Unable to update job status',
+      );
     }
   }
 
@@ -169,6 +214,7 @@ export function Dashboard() {
                 <th>Title</th>
                 <th>Type</th>
                 <th>Status</th>
+                <th>Duration</th>
                 <th>Created</th>
                 <th>Actions</th>
               </tr>
@@ -184,6 +230,7 @@ export function Dashboard() {
                       {job.status}
                     </span>
                   </td>
+                  <td className="duration">{getDuration(job.startedAt, job.completedAt)}</td>
                   <td>{new Date(job.createdAt).toLocaleString()}</td>
                   <td className="actions">
                     {getNextStatuses(job.status).map((nextStatus) => (
