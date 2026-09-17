@@ -11,9 +11,9 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 import { Controller, Post, Get, Patch, Delete, Body, Param, ParseIntPipe, HttpCode, } from '@nestjs/common';
-import { JobsService } from './jobs.service.js';
-import { CreateJobDto } from './dto/create-job.dto.js';
-import { UpdateJobStatusDto } from './dto/update-job-status.dto.js';
+import { JobsService } from "./jobs.service.js";
+import { CreateJobDto } from "./dto/create-job.dto.js";
+import { UpdateJobStatusDto } from "./dto/update-job-status.dto.js";
 let JobsController = class JobsController {
     jobsService;
     constructor(jobsService) {

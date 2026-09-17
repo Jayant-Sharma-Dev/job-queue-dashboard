@@ -33,11 +33,11 @@ export class JobsService {
     }
 
     // Define allowed status transitions
-    const allowedTransitions = {
-      PENDING: ['RUNNING', 'FAILED'],
-      RUNNING: ['COMPLETED', 'FAILED'],
-      COMPLETED: [],
-      FAILED: [],
+    const allowedTransitions: Record<JobStatus, JobStatus[]> = {
+      [JobStatus.PENDING]: [JobStatus.RUNNING, JobStatus.FAILED],
+      [JobStatus.RUNNING]: [JobStatus.COMPLETED, JobStatus.FAILED],
+      [JobStatus.COMPLETED]: [],
+      [JobStatus.FAILED]: [],
     };
 
     const currentStatus = job.status;
@@ -71,7 +71,7 @@ export class JobsService {
     }
 
     // Return the updated job
-    return this.prisma.job.findUnique({ where: { id } });
+    return this.prisma.job.findUniqueOrThrow({ where: { id } });
   }
 
   // DELETE a job

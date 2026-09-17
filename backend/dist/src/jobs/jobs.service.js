@@ -8,7 +8,8 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../../prisma/prisma.service.js';
+import { PrismaService } from "../../prisma/prisma.service.js";
+import { JobStatus } from "./dto/update-job-status.dto.js";
 let JobsService = class JobsService {
     prisma;
     constructor(prisma) {
@@ -32,10 +33,10 @@ let JobsService = class JobsService {
             throw new NotFoundException(`Job with id ${id} not found`);
         }
         const allowedTransitions = {
-            PENDING: ['RUNNING', 'FAILED'],
-            RUNNING: ['COMPLETED', 'FAILED'],
-            COMPLETED: [],
-            FAILED: [],
+            [JobStatus.PENDING]: [JobStatus.RUNNING, JobStatus.FAILED],
+            [JobStatus.RUNNING]: [JobStatus.COMPLETED, JobStatus.FAILED],
+            [JobStatus.COMPLETED]: [],
+            [JobStatus.FAILED]: [],
         };
         const currentStatus = job.status;
         const nextStatus = updateJobStatusDto.status;
@@ -54,7 +55,7 @@ let JobsService = class JobsService {
         if (result.count === 0) {
             throw new BadRequestException(`Job status has already changed. Expected ${currentStatus} but found something else`);
         }
-        return this.prisma.job.findUnique({ where: { id } });
+        return this.prisma.job.findUniqueOrThrow({ where: { id } });
     }
     async remove(id) {
         const job = await this.prisma.job.findUnique({ where: { id } });

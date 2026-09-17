@@ -1,7 +1,7 @@
-import { PrismaService } from '../../prisma/prisma.service.js';
-import { CreateJobDto } from './dto/create-job.dto.js';
-import { UpdateJobStatusDto } from './dto/update-job-status.dto.js';
-import { Job } from './entities/job.entity.js';
+import { PrismaService } from '../../prisma/prisma.service.ts';
+import { CreateJobDto } from './dto/create-job.dto.ts';
+import { UpdateJobStatusDto } from './dto/update-job-status.dto.ts';
+import { Job } from './entities/job.entity.ts';
 export declare class JobsService {
     private prisma;
     constructor(prisma: PrismaService);
