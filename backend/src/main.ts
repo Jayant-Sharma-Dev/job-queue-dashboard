@@ -8,7 +8,7 @@ async function bootstrap() {
     origin: [
       'http://localhost:5173',
       'http://localhost:3000',
-      'https://job-queue-dashboard-opal-two.vercel.app',
+      'https://job-queue-dashboard-opal-two.vercel.app/',
     ],
     credentials: true,
   });
